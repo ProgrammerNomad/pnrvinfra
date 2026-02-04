@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,10 +9,33 @@ import { Separator } from "@/components/ui/separator";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 
 export default function ContactPage() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission
-    alert("Thank you for your message! We will get back to you soon.");
+    setIsSubmitting(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData as any).toString(),
+      });
+
+      if (response.ok) {
+        alert("Thank you for your quote request! We will get back to you within 24 hours.");
+        form.reset();
+      } else {
+        throw new Error("Form submission failed");
+      }
+    } catch (error) {
+      alert("There was an error submitting your form. Please try again or contact us directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -39,38 +63,53 @@ export default function ContactPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form 
+                  name="quote-request" 
+                  method="POST" 
+                  data-netlify="true"
+                  onSubmit={handleSubmit} 
+                  className="space-y-6"
+                >
+                  <input type="hidden" name="form-name" value="quote-request" />
+                  
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name *</Label>
-                    <Input id="name" placeholder="Rajesh Kumar" required />
+                    <Input id="name" name="name" placeholder="Rajesh Kumar" required />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address *</Label>
-                    <Input id="email" type="email" placeholder="rajesh@example.com" required />
+                    <Input id="email" name="email" type="email" placeholder="rajesh@example.com" required />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number *</Label>
-                    <Input id="phone" type="tel" placeholder="+91 98765 43210" required />
+                    <Input id="phone" name="phone" type="tel" placeholder="+91 98765 43210" required />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Project Type *</Label>
-                    <Input id="subject" placeholder="e.g., Residential Construction, Infrastructure Development" required />
+                    <Label htmlFor="project-type">Project Type *</Label>
+                    <Input id="project-type" name="project-type" placeholder="e.g., Residential Construction, Infrastructure Development" required />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="message">Project Details *</Label>
                     <textarea
                       id="message"
+                      name="message"
                       className="w-full min-h-[150px] px-3 py-2 text-sm rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       placeholder="Tell us about your project requirements, timeline, budget, and any specific details..."
                       required
                     />
                   </div>
                   
-                  <Button type="submit" className="w-full bg-brand-secondary hover:bg-brand-primary">Submit Quote Request</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-brand-secondary hover:bg-brand-primary"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Quote Request"}
+                  </Button>
                 </form>
               </CardContent>
             </Card>
