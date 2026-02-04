@@ -1,7 +1,6 @@
 "use client";
 
-"use client";
-
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -13,10 +12,15 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export default function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeMenu = () => setIsOpen(false);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white backdrop-blur supports-[backdrop-filter]:bg-white/95">
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
@@ -92,30 +96,56 @@ export default function Header() {
           </Button>
 
           {/* Mobile Navigation */}
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="outline" size="icon">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <nav className="flex flex-col gap-4 mt-8">
-                <Link href="/" className="text-lg font-medium hover:text-primary transition-colors">
+            <SheetContent side="right" className="w-[300px]">
+              <VisuallyHidden>
+                <SheetTitle>Navigation Menu</SheetTitle>
+                <SheetDescription>Main navigation links</SheetDescription>
+              </VisuallyHidden>
+              <nav className="flex flex-col gap-6 mt-12">
+                <Link 
+                  href="/" 
+                  onClick={closeMenu}
+                  className="text-lg font-semibold hover:text-brand-secondary transition-colors py-2 pl-4 border-b border-gray-200"
+                >
                   Home
                 </Link>
-                <Link href="/about" className="text-lg font-medium hover:text-primary transition-colors">
+                <Link 
+                  href="/about" 
+                  onClick={closeMenu}
+                  className="text-lg font-semibold hover:text-brand-secondary transition-colors py-2 pl-4 border-b border-gray-200"
+                >
                   About
                 </Link>
-                <Link href="/services" className="text-lg font-medium hover:text-primary transition-colors">
+                <Link 
+                  href="/services" 
+                  onClick={closeMenu}
+                  className="text-lg font-semibold hover:text-brand-secondary transition-colors py-2 pl-4 border-b border-gray-200"
+                >
                   Services
                 </Link>
-                <Link href="/projects" className="text-lg font-medium hover:text-primary transition-colors">
+                <Link 
+                  href="/projects" 
+                  onClick={closeMenu}
+                  className="text-lg font-semibold hover:text-brand-secondary transition-colors py-2 pl-4 border-b border-gray-200"
+                >
                   Projects
                 </Link>
-                <Link href="/contact" className="text-lg font-medium hover:text-primary transition-colors">
+                <Link 
+                  href="/contact" 
+                  onClick={closeMenu}
+                  className="text-lg font-semibold hover:text-brand-secondary transition-colors py-2 pl-4 border-b border-gray-200"
+                >
                   Contact
                 </Link>
-                <Button className="mt-4">Get Quote</Button>
+                <Button className="mt-6 w-full bg-brand-secondary hover:bg-brand-primary" asChild onClick={closeMenu}>
+                  <Link href="/contact">Get Quote</Link>
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
